@@ -328,3 +328,68 @@
     }
   });
 })();
+
+/* ============================================================
+   Stories from the CMS
+   Reads data/stories.json (edited via /admin) and renders each
+   entry as a card under the featured story. Content is inserted
+   with textContent (never innerHTML), so editor text can't break
+   the page or inject markup. Fails silently — stories are optional.
+   ============================================================ */
+(function () {
+  'use strict';
+  var wrap = document.getElementById('moreStories');
+  var grid = document.getElementById('storyCards');
+  if (!wrap || !grid) return;
+
+  fetch('data/stories.json', { cache: 'no-cache' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      var stories = (data && Array.isArray(data.stories)) ? data.stories : [];
+      if (!stories.length) return;
+
+      // Most recently added story first (the CMS appends new entries to the end).
+      stories = stories.slice().reverse();
+
+      var frag = document.createDocumentFragment();
+      stories.forEach(function (s) {
+        if (!s || !s.title) return;
+        var card = document.createElement('article');
+        card.className = 'story-card';
+
+        if (s.image) {
+          var img = document.createElement('img');
+          img.src = s.image;
+          img.alt = s.alt || s.title || '';
+          img.loading = 'lazy';
+          card.appendChild(img);
+        }
+
+        var body = document.createElement('div');
+        body.className = 'story-card-body';
+
+        var h = document.createElement('h4');
+        h.textContent = s.title;
+        body.appendChild(h);
+
+        if (s.body) {
+          String(s.body).split(/\n\s*\n/).forEach(function (para) {
+            var text = para.trim();
+            if (!text) return;
+            var p = document.createElement('p');
+            p.textContent = text;
+            body.appendChild(p);
+          });
+        }
+
+        card.appendChild(body);
+        frag.appendChild(card);
+      });
+
+      if (frag.childNodes.length) {
+        grid.appendChild(frag);
+        wrap.hidden = false;
+      }
+    })
+    .catch(function () { /* stories are non-critical — ignore errors */ });
+})();

@@ -1,0 +1,41 @@
+# Decap CMS configuration for the Tolno Education Trust website.
+# Editors log in with GitHub and manage the Stories shown on the site.
+
+backend:
+  name: github
+  repo: tolnoeducationtrust-collab/tolno-education-trust-website
+  branch: main
+  # "Login with GitHub" is handled by our own serverless functions
+  # (netlify/functions/auth.js + callback.js).
+  base_url: https://www.tolnoeducationtrust.org.uk
+  auth_endpoint: .netlify/functions/auth
+
+# Where uploaded photos are stored (paths are relative to the repo root).
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+# Show a live preview link and friendlier commit messages.
+site_url: https://www.tolnoeducationtrust.org.uk
+display_url: https://www.tolnoeducationtrust.org.uk
+publish_mode: simple
+
+collections:
+  - name: "stories"
+    label: "Stories"
+    description: "Add and edit the success stories shown on the website."
+    files:
+      - name: "stories"
+        label: "Success stories"
+        file: "data/stories.json"
+        description: "Each entry becomes a story card on the site. Newest is shown first."
+        fields:
+          - name: "stories"
+            label: "Stories"
+            label_singular: "Story"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - { name: "title", label: "Title", widget: "string" }
+              - { name: "image", label: "Photo", widget: "image", required: false, choose_url: false, hint: "Upload a photo for this story (optional)." }
+              - { name: "alt", label: "Photo description", widget: "string", required: false, hint: "Briefly describe the photo (for screen readers and if the image can't load)." }
+              - { name: "body", label: "Story text", widget: "text", hint: "The story. Leave a blank line between paragraphs." }

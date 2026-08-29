@@ -1,0 +1,4 @@
+# Tolno Education Trust — Netlify configuration.
+# Static site (no build step). Serverless functions power the CMS "Login with GitHub".
+[functions]
+  directory = "netlify/functions"

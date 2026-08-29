@@ -45,7 +45,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="css/styles.css?v=32" />
+  <link rel="stylesheet" href="css/styles.css?v=33" />
 </head>
 <body>
   <a class="skip-link" href="#main" data-i18n="skip">Skip to main content</a>
@@ -575,6 +575,12 @@
             <a href="#donate" class="btn btn-primary support-btn" data-i18n="stories.cta">Help students like Fanta</a>
           </div>
         </div>
+
+        <!-- Additional stories, managed via the CMS (data/stories.json) -->
+        <div class="more-stories" id="moreStories" hidden>
+          <h3 class="more-stories-title" data-i18n="stories.more">More stories</h3>
+          <div class="story-cards" id="storyCards"></div>
+        </div>
       </div>
     </section>
 
@@ -692,7 +698,7 @@
     </div>
   </footer>
 
-  <script src="js/main.js?v=18"></script>
+  <script src="js/main.js?v=20"></script>
   <script src="js/consent.js?v=1"></script>
 </body>
 </html>

@@ -308,23 +308,61 @@
 })();
 
 /* ============================================================
-   Donate button tracking (Google Analytics 4)
-   Fires a "donate_click" event when the PayPal donate button is
-   clicked. gtag only exists after the visitor accepts analytics
-   cookies (see consent.js), so this respects consent automatically —
-   no event is sent unless the visitor has agreed to analytics.
+   Key link tracking (Google Analytics 4)
+   Fires a distinct GA4 event when a visitor clicks a key contact or
+   external link:
+     • PayPal donate link           -> donate_click
+     • "Email to donate books" link -> email_books_click
+     • Any other mailto: email link -> email_contact_click
+     • Facebook link                -> facebook_click
+     • Instagram link               -> instagram_click
+   A single delegated click handler covers every matching link on the
+   page, and each click fires exactly one event (the first matching
+   type wins), so the donate_click event is never double-counted.
+   gtag only exists after the visitor accepts analytics cookies (see
+   consent.js), so this respects consent automatically — no event is
+   sent unless the visitor has agreed to analytics.
    ============================================================ */
 (function () {
   'use strict';
+
+  // Ordered list of link types to detect; the FIRST match wins. Donate is
+  // checked before email so a PayPal link never counts as email/social, and
+  // the "donate books" email (the only mailto: carrying a Book-donation
+  // subject) is checked before the general contact email, so a general
+  // mailto: falls through to email_contact_click.
+  var TRACKED = [
+    { event: 'donate_click',         match: 'a[href*="paypal.com/donate"]', extra: { method: 'paypal' } },
+    { event: 'email_books_click',    match: 'a[href^="mailto:"][href*="subject=Book"]' },
+    { event: 'email_contact_click',  match: 'a[href^="mailto:"]' },
+    { event: 'facebook_click',       match: 'a[href*="facebook.com"]' },
+    { event: 'instagram_click',      match: 'a[href*="instagram.com"]' }
+  ];
+
+  function linkText(link) {
+    var text = (link.textContent || '').replace(/\s+/g, ' ').trim();
+    return text || link.getAttribute('aria-label') || link.getAttribute('title') || '';
+  }
+
   document.addEventListener('click', function (e) {
-    var link = e.target.closest && e.target.closest('a[href*="paypal.com/donate"]');
-    if (!link) return;
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', 'donate_click', {
-        method: 'paypal',
-        link_url: link.href,
-        transport_type: 'beacon'
-      });
+    if (!e.target.closest) return;
+
+    for (var i = 0; i < TRACKED.length; i++) {
+      var link = e.target.closest(TRACKED[i].match);
+      if (!link) continue;
+
+      if (typeof window.gtag === 'function') {
+        var params = {
+          link_url: link.href,
+          link_text: linkText(link),
+          page_location: window.location.href,
+          transport_type: 'beacon'
+        };
+        var extra = TRACKED[i].extra;
+        if (extra) { for (var k in extra) { if (extra.hasOwnProperty(k)) params[k] = extra[k]; } }
+        window.gtag('event', TRACKED[i].event, params);
+      }
+      return; // one event per click — stop at the first matching type
     }
   });
 })();

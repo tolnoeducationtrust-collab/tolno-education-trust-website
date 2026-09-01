@@ -368,6 +368,48 @@
 })();
 
 /* ============================================================
+   Currency selector for PayPal donations
+   ============================================================ */
+(function () {
+  'use strict';
+  var currencySelect = document.getElementById('currencySelect');
+  var paypalLink = document.getElementById('paypalLink');
+  var currencyNote = document.getElementById('currencyNote');
+
+  if (!currencySelect || !paypalLink || !currencyNote) return;
+
+  function updateCurrency(code) {
+    var baseUrl = 'https://www.paypal.com/donate/?hosted_button_id=GQPLW8DYW6PA&currency_code=';
+    var returnUrl = '&return=https://www.tolnoeducationtrust.org.uk/';
+    var cancelUrl = '&cancel_return=https://www.tolnoeducationtrust.org.uk/';
+    paypalLink.href = baseUrl + code + returnUrl + cancelUrl;
+
+    var isFrench = document.documentElement.lang === 'fr';
+    var labels = {
+      'GBP': { en: 'British Pounds (GBP)', fr: 'livres sterling (GBP)' },
+      'USD': { en: 'US Dollars (USD)', fr: 'dollars americains (USD)' },
+      'EUR': { en: 'Euros (EUR)', fr: 'euros (EUR)' }
+    };
+    var label = labels[code][isFrench ? 'fr' : 'en'];
+    var noteText = isFrench
+      ? 'Vous ferez un don en ' + label + '.'
+      : 'You\'ll donate in ' + label + '.';
+    currencyNote.textContent = noteText;
+  }
+
+  currencySelect.addEventListener('change', function () {
+    updateCurrency(this.value);
+  });
+
+  var langToggle = document.getElementById('langToggle');
+  if (langToggle) {
+    langToggle.addEventListener('click', function () {
+      updateCurrency(currencySelect.value);
+    });
+  }
+})();
+
+/* ============================================================
    Stories from the CMS
    Reads data/stories.json (edited via /admin) and renders each
    entry as a card under the featured story. Content is inserted

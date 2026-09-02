@@ -407,6 +407,9 @@
       updateCurrency(currencySelect.value);
     });
   }
+
+  // Initialize on page load
+  updateCurrency(currencySelect.value);
 })();
 
 /* ============================================================

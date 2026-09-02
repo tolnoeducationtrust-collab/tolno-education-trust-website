@@ -379,7 +379,7 @@
   if (!currencySelect || !paypalLink || !currencyNote) return;
 
   function updateCurrency(code) {
-    var baseUrl = 'https://www.paypal.com/donate/?hosted_button_id=GQPLW8DYW6PA&currency_code=' + code;
+    var baseUrl = 'https://www.paypal.com/donate/?hosted_button_id=6QAJMPKUPJNJQ&currency_code=' + code;
     var returnUrl = '&return=https%3A%2F%2Fwww.tolnoeducationtrust.org.uk%2F';
     var cancelUrl = '&cancel_return=https%3A%2F%2Fwww.tolnoeducationtrust.org.uk%2F';
     paypalLink.href = baseUrl + returnUrl + cancelUrl;

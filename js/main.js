@@ -378,6 +378,29 @@
 
   if (!currencySelect || !paypalLink || !currencyNote) return;
 
+  var currencyLabels = {
+    'GBP': { en: 'GBP - British Pound', fr: 'GBP - Livre sterling' },
+    'USD': { en: 'USD - US Dollar', fr: 'USD - Dollar américain' },
+    'EUR': { en: 'EUR - Euro', fr: 'EUR - Euro' }
+  };
+
+  var noteLabelsFull = {
+    'GBP': { en: 'British Pounds (GBP)', fr: 'livres sterling (GBP)' },
+    'USD': { en: 'US Dollars (USD)', fr: 'dollars américains (USD)' },
+    'EUR': { en: 'Euros (EUR)', fr: 'euros (EUR)' }
+  };
+
+  function updateDropdownLabels() {
+    var isFrench = document.documentElement.lang === 'fr';
+    var options = currencySelect.querySelectorAll('option');
+    options.forEach(function (opt) {
+      var code = opt.value;
+      if (currencyLabels[code]) {
+        opt.textContent = currencyLabels[code][isFrench ? 'fr' : 'en'];
+      }
+    });
+  }
+
   function updateCurrency(code) {
     var baseUrl = 'https://www.paypal.com/donate/?hosted_button_id=6QAJMPKUPJNJQ&currency_code=' + code;
     var returnUrl = '&return=https%3A%2F%2Fwww.tolnoeducationtrust.org.uk%2F';
@@ -385,12 +408,7 @@
     paypalLink.href = baseUrl + returnUrl + cancelUrl;
 
     var isFrench = document.documentElement.lang === 'fr';
-    var labels = {
-      'GBP': { en: 'British Pounds (GBP)', fr: 'livres sterling (GBP)' },
-      'USD': { en: 'US Dollars (USD)', fr: 'dollars americains (USD)' },
-      'EUR': { en: 'Euros (EUR)', fr: 'euros (EUR)' }
-    };
-    var label = labels[code][isFrench ? 'fr' : 'en'];
+    var label = noteLabelsFull[code][isFrench ? 'fr' : 'en'];
     var noteText = isFrench
       ? 'Vous ferez un don en ' + label + '.'
       : 'You\'ll donate in ' + label + '.';
@@ -404,11 +422,13 @@
   var langToggle = document.getElementById('langToggle');
   if (langToggle) {
     langToggle.addEventListener('click', function () {
+      updateDropdownLabels();
       updateCurrency(currencySelect.value);
     });
   }
 
   // Initialize on page load
+  updateDropdownLabels();
   updateCurrency(currencySelect.value);
 })();
 
